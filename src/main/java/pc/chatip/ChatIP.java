@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class ChatIP {
 
-    private static int contador = 0;
-    private static final ArrayList<Tarefa> tarefas = new ArrayList<>();
+//    private static int contador = 0;
+//    private static final ArrayList<Tarefa> tarefas = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println("Servidor Afazeres!");

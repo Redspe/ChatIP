@@ -15,16 +15,20 @@ public class ClienteInterno implements Runnable {
     @Override
     public void run() {
         try {
+            
+            // Cria as variaveis de conexao
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             String requisicao, resposta;
 
             do {
-                requisicao = (String) input.readObject();
-                System.out.println(requisicao);
+                requisicao = (String) input.readObject(); // Le os dados recebidos
+                System.out.println(requisicao); // Imprime os dados recebidos
                 resposta = getRespostaTDP(requisicao);
                 output.writeObject(resposta);
+                
             } while (!requisicao.equals("EXIT"));
+            
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
