@@ -37,22 +37,9 @@ public class ClienteInterno implements Runnable {
     private String getRespostaTDP(String requisicao) { // TDP - ToDo Protocol
         if (requisicao.startsWith("PUT") && requisicao.length() > 4) {
 
-            String tarefa = requisicao.substring(4);
-            ChatIP.put(tarefa);
+            // String tarefa = requisicao.substring(4);
+            // ChatIP.put(tarefa);
             return "OK";
-
-        } else if (requisicao.startsWith("GET") && requisicao.length() > 4) {
-            try {
-                int numero = Integer.parseInt(requisicao.substring(4));
-                String tarefa = ChatIP.get(numero);
-                return tarefa == null ? "NOT-FOUND" : numero + ". " + tarefa;
-            } catch (Exception e) {
-                return "ERRO";
-            }
-
-        } else if (requisicao.equals("LIST")) {
-            String afazeres = ChatIP.list();
-            return afazeres == null ? "Lista vazia!" : afazeres;
 
         } else if (requisicao.equals("EXIT")) {
             return "BYE";
