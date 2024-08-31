@@ -11,13 +11,15 @@ public class ChatServer {
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Chat server started on port " + PORT + "\n");
+            System.out.println("Servidor do chat iniciado na porta " + PORT + "\n");
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
+                Socket clientSocket = serverSocket.accept(); // Connects to new users
+                
+                System.out.println("Novo cliente conectado: " + clientSocket.getInetAddress().getHostAddress());
+                
                 ClientHandler clientHandler = new ClientHandler(clientSocket, clientHandlers);
-                clientHandlers.add(clientHandler);
+                clientHandlers.add(clientHandler); // Adds to the users list
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {

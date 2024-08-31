@@ -27,7 +27,7 @@ public class ClientHandler implements Runnable {
         try {
             String message;
             while ((message = in.readLine()) != null) {
-                System.out.println("Received: " + message);
+                System.out.println("Recebido: " + message);
                 broadcastMessage(message);
             }
         } catch (IOException e) {
@@ -49,7 +49,7 @@ public class ClientHandler implements Runnable {
         try {
             clientHandlers.remove(this);
             socket.close();
-            System.out.println("Client disconnected: " + socket.getInetAddress().getHostAddress());
+            System.out.println("Cliente desconectou: " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
