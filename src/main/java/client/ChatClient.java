@@ -14,7 +14,9 @@ public class ChatClient {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            System.out.println("Connected to chat server");
+            System.out.println("Connectado ao servidor do chat");
+            
+            
 
             // Thread for reading messages from the server
             new Thread(() -> {
