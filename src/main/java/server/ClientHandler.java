@@ -45,7 +45,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private void closeConnection() {
+    void closeConnection() {
         try {
             clientHandlers.remove(this);
             socket.close();
