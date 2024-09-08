@@ -38,6 +38,9 @@ public class ChatClientGUI extends JFrame {
         sendButton.setEnabled(false);
         sendButton.addActionListener(this::sendMessage);
         add(sendButton, BorderLayout.EAST);
+        
+        getRootPane().setDefaultButton(sendButton);
+        sendButton.requestFocus();
 
         JPanel topPanel = new JPanel();
         connectButton = new JButton("Conectar");
