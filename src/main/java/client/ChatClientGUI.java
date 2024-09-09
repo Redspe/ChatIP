@@ -10,6 +10,7 @@ import java.net.Socket;
 public class ChatClientGUI extends JFrame {
     private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 12345;
+    private String user;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
@@ -57,6 +58,9 @@ public class ChatClientGUI extends JFrame {
     }
 
     private void connectToServer(ActionEvent event) {
+        if (user == null) {
+            user = IOGUI.readStrGUI("Nome de Usuário", "Nome de usuário");
+        }
         try {
             socket = new Socket(SERVER_IP, SERVER_PORT);
             out = new PrintWriter(socket.getOutputStream(), true);
