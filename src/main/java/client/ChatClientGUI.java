@@ -30,18 +30,27 @@ public class ChatClientGUI extends JFrame {
         chatArea.setEditable(false);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
 
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+
         messageField = new JTextField();
         messageField.setEnabled(false);
-        add(messageField, BorderLayout.SOUTH);
+        messageField.setPreferredSize(new Dimension(400, 30));
+        messageField.setMinimumSize(new Dimension(400, 30));
+        bottomPanel.add(messageField);
 
         sendButton = new JButton("Enviar");
         sendButton.setEnabled(false);
         sendButton.addActionListener(this::sendMessage);
-        add(sendButton, BorderLayout.EAST);
-        
+        sendButton.setPreferredSize(new Dimension(80, 30));
+        sendButton.setMinimumSize(new Dimension(80, 30));
+        bottomPanel.add(sendButton);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
         getRootPane().setDefaultButton(sendButton);
         sendButton.requestFocus();
-
+        
         JPanel topPanel = new JPanel();
         connectButton = new JButton("Conectar");
         disconnectButton = new JButton("Desconectar");
