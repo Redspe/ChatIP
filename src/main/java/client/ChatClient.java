@@ -4,8 +4,6 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ChatClient {
     private static final String SERVER_IP = "127.0.0.1"; // Change to the server's IP address
@@ -29,8 +27,8 @@ public class ChatClient {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }).start();
 
