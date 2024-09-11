@@ -8,12 +8,13 @@ import java.io.*;
 import java.net.Socket;
 
 public class ChatClientGUI extends JFrame {
+
     private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 12345;
     private String user;
     private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     private JTextArea chatArea;
     private JTextField messageField;
     private JButton sendButton;
@@ -37,9 +38,15 @@ public class ChatClientGUI extends JFrame {
 
         sendButton = new JButton("Enviar");
         sendButton.setEnabled(false);
-        sendButton.addActionListener(this::sendMessage);
+        sendButton.addActionListener(event -> {
+            try {
+                this.sendMessage(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         add(sendButton, BorderLayout.EAST);
-        
+
         getRootPane().setDefaultButton(sendButton);
         sendButton.requestFocus();
 
@@ -58,14 +65,15 @@ public class ChatClientGUI extends JFrame {
     }
 
     private void connectToServer(ActionEvent event) {
-        if (user == null) {
-            user = IOGUI.readStrGUI("Nome de Usuário", "Nome de usuário");
-        }
         try {
             socket = new Socket(SERVER_IP, SERVER_PORT);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
             chatArea.append("Conectado ao servidor.\n");
+
+            if (user == null) {
+                user = IOGUI.readStrGUI("Nome de Usuário", "Nome de usuário");
+            }
 
             isConnected = true;
             messageField.setEnabled(true);
@@ -75,13 +83,16 @@ public class ChatClientGUI extends JFrame {
 
             // Thread to listen for messages from the server
             new Thread(() -> {
-                String message;
+                Message msg;
+
                 try {
-                    while ((message = in.readLine()) != null) {
-                        chatArea.append("Servidor: " + message + "\n");
+                    while ((msg = (Message) in.readObject()) != null) {
+                        chatArea.append(msg.getUsername() + ": " + msg.getMsg() + "\n");
                     }
                 } catch (IOException e) {
                     chatArea.append("Erro de conexão: " + e.getMessage() + "\n");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }).start();
 
@@ -90,9 +101,10 @@ public class ChatClientGUI extends JFrame {
         }
     }
 
-    private void sendMessage(ActionEvent event) {
+    private void sendMessage(ActionEvent event) throws IOException {
         if (isConnected && !messageField.getText().trim().isEmpty()) {
-            out.println(messageField.getText().trim());
+            Message msg = new Message(user, messageField.getText().trim());
+            out.writeObject(msg);
             chatArea.append("Você: " + messageField.getText().trim() + "\n");
             messageField.setText("");
         }

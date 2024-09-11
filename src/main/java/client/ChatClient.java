@@ -4,6 +4,8 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ChatClient {
     private static final String SERVER_IP = "127.0.0.1"; // Change to the server's IP address
@@ -11,8 +13,8 @@ public class ChatClient {
 
     public static void main(String[] args) {
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
 
             System.out.println("Connectado ao servidor do chat");
             
@@ -20,21 +22,23 @@ public class ChatClient {
 
             // Thread for reading messages from the server
             new Thread(() -> {
-                String message;
+                Message message;
                 try {
-                    while ((message = in.readLine()) != null) {
+                    while ((message = (Message) in.readObject()) != null) {
                         System.out.println("Server: " + message);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }).start();
 
             // Main thread for sending messages to the server
             Scanner scanner = new Scanner(System.in);
             while (true) {
-                String messageToSend = scanner.nextLine();
-                out.println(messageToSend);
+                Message messageToSend = new Message("User Teste", scanner.nextLine());
+                out.writeObject(messageToSend);
             }
         } catch (IOException e) {
             e.printStackTrace();
