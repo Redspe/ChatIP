@@ -4,6 +4,7 @@ package client;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 
@@ -19,8 +20,9 @@ public class ChatClientGUI extends JFrame {
     private JButton connectButton;
     private JButton disconnectButton;
     private boolean isConnected;
+    private JButton emojiButton;
 
-    public ChatClientGUI() {
+    public  ChatClientGUI() {
         setTitle("Chat Cliente");
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,8 +37,8 @@ public class ChatClientGUI extends JFrame {
 
         messageField = new JTextField();
         messageField.setEnabled(false);
-        messageField.setPreferredSize(new Dimension(400, 30));
-        messageField.setMinimumSize(new Dimension(400, 30));
+        messageField.setPreferredSize(new Dimension(350, 30));
+        messageField.setMinimumSize(new Dimension(350, 30));
         bottomPanel.add(messageField);
 
         sendButton = new JButton("Enviar");
@@ -45,12 +47,62 @@ public class ChatClientGUI extends JFrame {
         sendButton.setPreferredSize(new Dimension(80, 30));
         sendButton.setMinimumSize(new Dimension(80, 30));
         bottomPanel.add(sendButton);
-
         add(bottomPanel, BorderLayout.SOUTH);
-
         getRootPane().setDefaultButton(sendButton);
         sendButton.requestFocus();
-        
+
+        Font emojiFont = new Font("Segoe UI Emoji", Font.PLAIN, 14); //
+        messageField.setFont(emojiFont);
+        chatArea.setFont(emojiFont);
+
+
+        emojiButton = new JButton("\uD83D\uDE0A");
+        emojiButton.setEnabled(false);
+        emojiButton.setPreferredSize(new Dimension(50, 30));
+        emojiButton.setMinimumSize(new Dimension(50, 30));
+        bottomPanel.add(emojiButton);
+
+        String[] emojis = {
+                "\uD83D\uDE04", // 😄
+                "\uD83E\uDD23", // 🤣
+                "\uD83E\uDEE0", // 🫠
+                "\uD83D\uDE07", // 😇
+                "\uD83E\uDD70", // 🥰
+                "\uD83D\uDE0D", // 😍
+                "\uD83D\uDE1C", // 😜
+                "\uD83E\uDD2A", // 🤪
+                "\uD83D\uDE1D", // 😝
+                "\uD83E\uDD11", // 🤑
+                "\uD83E\uDD17", // 🤗
+                "\uD83E\uDD10", // 🤐
+                "\uD83D\uDE10", // 😐
+                "\uD83D\uDE0F", // 😏
+                "\uD83D\uDE12", // 😒
+                "\uD83D\uDE14"  // 😔
+        };
+
+        JPopupMenu menuEmojis = new JPopupMenu();
+        for (String emoji : emojis) {
+            JMenuItem emojiItem = new JMenuItem(emoji);
+            emojiItem.setPreferredSize(new Dimension(50, 30));
+            emojiItem.setFont(emojiFont);
+            emojiItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    messageField.setText(messageField.getText() + emoji);
+                }
+            });
+            menuEmojis.add(emojiItem);
+        }
+
+        emojiButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuEmojis.show(emojiButton, 0, emojiButton.getHeight());
+            }
+        });
+
+
         JPanel topPanel = new JPanel();
         connectButton = new JButton("Conectar");
         disconnectButton = new JButton("Desconectar");
@@ -77,6 +129,7 @@ public class ChatClientGUI extends JFrame {
             sendButton.setEnabled(true);
             connectButton.setEnabled(false);
             disconnectButton.setEnabled(true);
+            emojiButton.setEnabled(true);
 
             // Thread to listen for messages from the server
             new Thread(() -> {
