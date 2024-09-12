@@ -11,8 +11,8 @@ public class ChatClient {
 
     public static void main(String[] args) {
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
 
             System.out.println("Connectado ao servidor do chat");
             
@@ -20,12 +20,14 @@ public class ChatClient {
 
             // Thread for reading messages from the server
             new Thread(() -> {
-                String message;
+                Message message;
                 try {
-                    while ((message = in.readLine()) != null) {
+                    while ((message = (Message) in.readObject()) != null) {
                         System.out.println("Server: " + message);
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }).start();
@@ -33,8 +35,8 @@ public class ChatClient {
             // Main thread for sending messages to the server
             Scanner scanner = new Scanner(System.in);
             while (true) {
-                String messageToSend = scanner.nextLine();
-                out.println(messageToSend);
+                Message messageToSend = new Message("User Teste", scanner.nextLine());
+                out.writeObject(messageToSend);
             }
         } catch (IOException e) {
             e.printStackTrace();

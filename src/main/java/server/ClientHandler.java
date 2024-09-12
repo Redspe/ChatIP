@@ -4,19 +4,20 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.Set;
+import client.Message;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     private Set<ClientHandler> clientHandlers;
 
     public ClientHandler(Socket socket, Set<ClientHandler> clientHandlers) {
         this.socket = socket;
         this.clientHandlers = clientHandlers;
         try {
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -25,22 +26,22 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Recebido: " + message);
+            Message message;
+            while ((message = (Message) in.readObject()) != null) {
+                System.out.println(message.getUsername() + ": " + message.getMsg());
                 broadcastMessage(message);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
             closeConnection();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    private void broadcastMessage(String message) {
+    private void broadcastMessage(Message message) throws IOException {
         for (ClientHandler client : clientHandlers) {
             if (client != this) {
-                client.out.println(message);
+                client.out.writeObject(message);
             }
         }
     }
