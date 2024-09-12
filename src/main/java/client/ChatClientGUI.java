@@ -4,6 +4,8 @@ package client;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
 
@@ -21,11 +23,15 @@ public class ChatClientGUI extends JFrame {
     private JButton connectButton;
     private JButton disconnectButton;
     private boolean isConnected;
+    private Thread msgListener;
+    private boolean closing = false;
 
     public ChatClientGUI() {
         setTitle("Chat Cliente");
         setSize(500, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setLocationByPlatform(true);
+
         setLayout(new BorderLayout());
 
         chatArea = new JTextArea();
@@ -62,6 +68,19 @@ public class ChatClientGUI extends JFrame {
         disconnectButton.addActionListener(this::disconnectFromServer);
 
         setVisible(true);
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(ChatClientGUI.this,
+                        "Você tem certeza que quer sair da conversa?", "Fechar a conversa?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    disconnectFromServer(null);
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     private void connectToServer(ActionEvent event) {
@@ -82,19 +101,27 @@ public class ChatClientGUI extends JFrame {
             disconnectButton.setEnabled(true);
 
             // Thread to listen for messages from the server
-            new Thread(() -> {
-                Message msg;
+            msgListener = new Thread(() -> {
+                Object input;
 
                 try {
-                    while ((msg = (Message) in.readObject()) != null) {
-                        chatArea.append(msg.getUsername() + ": " + msg.getMsg() + "\n");
+                    while ((input = in.readObject()) != null) {
+                        if (input instanceof Message) {
+                            Message msg = (Message) input;
+                            chatArea.append(msg.getUsername() + ": " + msg.getMsg() + "\n");
+                        } else {
+                            chatArea.append("Erro ao decodificar o tipo do dado recebido!");
+                        }
                     }
                 } catch (IOException e) {
-                    chatArea.append("Erro de conexão: " + e.getMessage() + "\n");
+                    if (!closing) {
+                        chatArea.append("Erro de conexão: " + e.getMessage() + "\n");
+                    }
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }).start();
+            });
+            msgListener.start();
 
         } catch (IOException e) {
             chatArea.append("Não foi possível conectar ao servidor: " + e.getMessage() + "\n");
@@ -113,6 +140,8 @@ public class ChatClientGUI extends JFrame {
     private void disconnectFromServer(ActionEvent event) {
         try {
             if (socket != null && !socket.isClosed()) {
+                closing = true;
+
                 socket.close();
             }
             isConnected = false;

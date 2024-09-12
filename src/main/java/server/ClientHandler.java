@@ -28,15 +28,13 @@ public class ClientHandler implements Runnable {
         try {
             Message message;
             while ((message = (Message) in.readObject()) != null) {
-                System.out.println("Recebido: " + message.getUsername() + ": " + message.getMsg());
+                System.out.println(message.getUsername() + ": " + message.getMsg());
                 broadcastMessage(message);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            closeConnection();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
         }
     }
 
