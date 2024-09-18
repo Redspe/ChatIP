@@ -36,6 +36,7 @@ public class ChatClientGUI extends JFrame {
 
         chatArea = new JTextArea();
         chatArea.setEditable(false);
+        chatArea.setLineWrap(true);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel();
