@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ChatClientGUI extends JFrame {
 
@@ -25,10 +27,12 @@ public class ChatClientGUI extends JFrame {
     private Thread msgListener;
     private boolean closing = false;
     private JButton emojiButton;
+    private JButton TransferButton;
+    private Object txtFile;
 
     public  ChatClientGUI() {
         setTitle("Chat Cliente");
-        setSize(500, 400);
+        setSize(600, 450);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationByPlatform(true);
 
@@ -57,6 +61,7 @@ public class ChatClientGUI extends JFrame {
                 e.printStackTrace();
             }
         });
+        
 
         sendButton.setPreferredSize(new Dimension(80, 30));
         sendButton.setMinimumSize(new Dimension(80, 30));
@@ -115,8 +120,34 @@ public class ChatClientGUI extends JFrame {
                 menuEmojis.show(emojiButton, 0, emojiButton.getHeight());
             }
         });
-
-
+        
+        sendButton.setPreferredSize(new Dimension(80, 30));
+        sendButton.setMinimumSize(new Dimension(80, 30));
+        bottomPanel.add(sendButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+        getRootPane().setDefaultButton(sendButton);
+        sendButton.requestFocus();
+        
+        TransferButton = new JButton("->");
+        TransferButton.setEnabled(false);
+        TransferButton.setPreferredSize(new Dimension(50, 30));
+        TransferButton.setMinimumSize(new Dimension(50, 30));
+        bottomPanel.add(TransferButton);
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle ("Arquivos");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        FileNameExtensionFilter filter = new FileNameExtensionFilter ("Imagem", "jpg", "png", "txt");
+        
+        fileChooser.setFileFilter(filter);
+        int retorno = fileChooser.showOpenDialog(this);
+        
+        if (retorno == JFileChooser.APPROVE_OPTION){
+            File file = fileChooser.getSelectedFile();
+            txtFile.setText(file.getPath());
+            lbImagem.setIcon(new Imageicon(file.getPath()))
+        
         JPanel topPanel = new JPanel();
         connectButton = new JButton("Conectar");
         disconnectButton = new JButton("Desconectar");
